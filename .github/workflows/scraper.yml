@@ -10,34 +10,40 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write  # 明確設置寫入權限
-    
+      
     steps:
     - uses: actions/checkout@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 自動提供的 token
-    
+        token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.10'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         playwright install chromium
-    
+
     - name: Run scraper
       run: python scraper.py
-      
+
     - name: Configure Git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-    
-    - name: Commit and push if changes
+
+    - name: Commit and push RSS file
       run: |
         git add ldsh_announcements.rss
         timestamp=$(date -u)
         git commit -m "Update RSS feed: ${timestamp}" || exit 0
         git push origin HEAD:${{ github.ref }}
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
