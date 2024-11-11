@@ -15,6 +15,9 @@ logging.basicConfig(
     ]
 )
 
+def remove_control_characters(text):
+    return ''.join(c for c in text if ord(c) >= 32 or c in '\n\r\t')
+
 async def scrape_announcements():
     try:
         async with async_playwright() as p:
@@ -59,7 +62,7 @@ async def scrape_announcements():
                             if len(tds) >= 3:
                                 title_element = tds[2].find('a')
                                 if title_element:
-                                    title = title_element.text.strip()
+                                    title = remove_control_characters(title_element.text.strip())
                                     link = title_element['href']
                                     if not link.startswith('http'):
                                         link = f"https://www.ldsh.ilc.edu.tw{link}"
@@ -70,7 +73,7 @@ async def scrape_announcements():
                                         processed_announcements.add(announcement_id)
                                         current_processed.add(announcement_id)
                                         
-                                        date_str = tds[0].text.strip()
+                                        date_str = remove_control_characters(tds[0].text.strip())
                                         try:
                                             pub_date = datetime.strptime(date_str, '%Y-%m-%d')
                                         except ValueError:
