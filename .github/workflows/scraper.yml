@@ -8,9 +8,13 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 明確設置寫入權限
     
     steps:
     - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 自動提供的 token
     
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -28,12 +32,12 @@ jobs:
       
     - name: Configure Git
       run: |
-        git config user.name "GitHub Actions Bot"
-        git config user.email "<>"
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
     
     - name: Commit and push if changes
       run: |
         git add ldsh_announcements.rss
         timestamp=$(date -u)
         git commit -m "Update RSS feed: ${timestamp}" || exit 0
-        git push
+        git push origin HEAD:${{ github.ref }}
