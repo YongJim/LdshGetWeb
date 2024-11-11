@@ -6,7 +6,7 @@ from datetime import datetime
 import logging
 import sys
 
-# 設置日誌
+# Set up logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -89,7 +89,7 @@ async def scrape_announcements():
                 scroll_count += 1
             
             logging.info("Writing RSS feed to file")
-            with open('ldsh_announcements.rss', 'w', encoding='utf-8') as f:
+            with open('ldsh_announcements.xml', 'w', encoding='utf-8') as f:
                 f.write(feed.writeString('utf-8'))
             
             await browser.close()
