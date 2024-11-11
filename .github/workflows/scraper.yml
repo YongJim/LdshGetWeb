@@ -37,7 +37,7 @@ jobs:
 
     - name: Commit and push RSS file
       run: |
-        git add ldsh_announcements.rss
+        git add ldsh_announcements.xml
         timestamp=$(date -u)
         git commit -m "Update RSS feed: ${timestamp}" || exit 0
         git push origin HEAD:${{ github.ref }}
