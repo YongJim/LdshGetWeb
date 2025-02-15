@@ -81,13 +81,17 @@ async def scrape_announcements():
                                         except ValueError:
                                             pub_date = datetime.now()
                                         
-                                        topimg_note = "(置頂公告) " if topimg_element else ""
+                                        is_pinned = "true" if topimg_element else "false"
                                         
                                         feed.add_item(
-                                            title=f"{topimg_note}{title}",
+                                            title=title,
                                             link=link,
                                             description="",
-                                            pubdate=pub_date
+                                            pubdate=pub_date,
+                                            # 加入自定義欄位來標記是否置頂
+                                            extra_attrs={
+                                                'isPinned': is_pinned
+                                            }
                                         )
                         except Exception as e:
                             logging.error(f"Error processing announcement: {e}")
