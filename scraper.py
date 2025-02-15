@@ -88,7 +88,7 @@ async def scrape_announcements():
                                             link=link,
                                             description="",
                                             pubdate=pub_date,
-                                            # 加入自定義欄位來標記是否置頂
+                                            
                                             extra_attrs={
                                                 'isPinned': is_pinned
                                             }
