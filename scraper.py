@@ -88,7 +88,6 @@ async def scrape_announcements():
                                             link=link,
                                             description="",
                                             pubdate=pub_date,
-                                            
                                             extra_attrs={
                                                 'isPinned': is_pinned
                                             }
@@ -100,8 +99,22 @@ async def scrape_announcements():
                 scroll_count += 1
             
             logging.info("Writing RSS feed to file")
+            rss_content = feed.writeString('utf-8')
+            
+            # 使用 BeautifulSoup 手動插入 isPinned 屬性
+            rss_soup = BeautifulSoup(rss_content, 'xml')
+            for item in rss_soup.find_all('item'):
+                title = item.title.text
+                link = item.link.text
+                announcement_id = f"{title}:{link}"
+                is_pinned = "true" if any(aid.startswith(announcement_id) and "true" in aid for aid in processed_announcements) else "false"
+                is_pinned_tag = rss_soup.new_tag('isPinned')
+                is_pinned_tag.string = is_pinned
+                item.append(is_pinned_tag)
+            
+            # 寫入修改後的 RSS feed
             with open('ldsh_announcements.xml', 'w', encoding='utf-8') as f:
-                f.write(feed.writeString('utf-8'))
+                f.write(str(rss_soup))
             
             await browser.close()
             return len(processed_announcements)
