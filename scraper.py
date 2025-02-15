@@ -61,6 +61,8 @@ async def scrape_announcements():
                             tds = row.find_all('td')
                             if len(tds) >= 3:
                                 title_element = tds[2].find('a')
+                                topimg_element = tds[2].find('i', class_='topimg')
+                                
                                 if title_element:
                                     title = remove_control_characters(title_element.text.strip())
                                     link = title_element['href']
@@ -79,8 +81,10 @@ async def scrape_announcements():
                                         except ValueError:
                                             pub_date = datetime.now()
                                         
+                                        topimg_note = "(置頂公告) " if topimg_element else ""
+                                        
                                         feed.add_item(
-                                            title=title,
+                                            title=f"{topimg_note}{title}",
                                             link=link,
                                             description="",
                                             pubdate=pub_date
