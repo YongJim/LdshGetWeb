@@ -81,16 +81,13 @@ async def scrape_announcements():
                                         except ValueError:
                                             pub_date = datetime.now()
                                         
-                                        is_pinned = "true" if topimg_element else "false"
+                                        topimg_note = "(置頂) " if topimg_element else ""
                                         
                                         feed.add_item(
-                                            title=title,
+                                            title=f"{topimg_note}{title}",
                                             link=link,
                                             description="",
-                                            pubdate=pub_date,
-                                            extra_attrs={
-                                                'isPinned': is_pinned
-                                            }
+                                            pubdate=pub_date
                                         )
                         except Exception as e:
                             logging.error(f"Error processing announcement: {e}")
@@ -99,22 +96,8 @@ async def scrape_announcements():
                 scroll_count += 1
             
             logging.info("Writing RSS feed to file")
-            rss_content = feed.writeString('utf-8')
-            
-            # 使用 BeautifulSoup 手動插入 isPinned 屬性
-            rss_soup = BeautifulSoup(rss_content, 'xml')
-            for item in rss_soup.find_all('item'):
-                title = item.title.text
-                link = item.link.text
-                announcement_id = f"{title}:{link}"
-                is_pinned = "true" if any(aid.startswith(announcement_id) and "true" in aid for aid in processed_announcements) else "false"
-                is_pinned_tag = rss_soup.new_tag('isPinned')
-                is_pinned_tag.string = is_pinned
-                item.append(is_pinned_tag)
-            
-            # 寫入修改後的 RSS feed
             with open('ldsh_announcements.xml', 'w', encoding='utf-8') as f:
-                f.write(str(rss_soup))
+                f.write(feed.writeString('utf-8'))
             
             await browser.close()
             return len(processed_announcements)
