@@ -81,7 +81,7 @@ async def scrape_announcements():
                                         except ValueError:
                                             pub_date = datetime.now()
                                         
-                                        topimg_note = "(置頂) " if topimg_element else ""
+                                        topimg_note = "📌 " if topimg_element else ""
                                         
                                         feed.add_item(
                                             title=f"{topimg_note}{title}",
